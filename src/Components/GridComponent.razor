@@ -1,0 +1,49 @@
+﻿
+<RgfGridComponent @ref="_rgfGridRef" EntityParameters="EntityParameters">
+    <GridTemplate Context="RgfGrid">
+        @if (_initialized)
+        {
+            <RadzenDataGrid @ref="_radzenGridRef" class="recro-grid" Data="@RgfGrid.GridData" TItem="RgfDynamicDictionary"
+                            AllowColumnResize="true" AllowColumnReorder="true"
+                            AllowSorting="@(EntityDesc.Options.GetBoolValue("RGO_ClientMode") != true)" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
+                            SelectionMode="DataGridSelectionMode.Single" Value="RgfGrid.SelectedItems" RowSelect="OnRowSelect" RowDeselect="OnRowDeselect"
+                            RowRender="OnRowRender" CellRender="OnCellRender"
+                            LoadData="OnLoadData" Sort="OnSort" ColumnReordered="OnColumnReordered" ColumnResized="OnColumnResized"
+                            RowDoubleClick="OnRowDoubleClick">
+                <Columns>
+                    @foreach (var prop in EntityDesc.SortedVisibleColumns)
+                    {
+                        <RadzenDataGridColumn TItem="RgfDynamicDictionary" Title="@prop.ColTitle" Property="@prop.Alias"
+                                              Sortable="prop.Orderable" 
+                                              Width="@(prop.ColWidth > 0 ? $"{prop.ColWidth}px" : null)">
+                            <Template>
+                                @RgfGrid.CreateGridColumn(prop, context)
+                            </Template>
+                        </RadzenDataGridColumn>
+                    }
+                </Columns>
+            </RadzenDataGrid>
+        }
+    </GridTemplate>
+
+    <ColumnSettingsTemplate>
+        <GridColumnSettingsComponent GridComponent="context" />
+    </ColumnSettingsTemplate>
+</RgfGridComponent>
+
+<style>
+
+    table.rz-grid-table.recro-grid, div.recro-grid > div > table.rz-grid-table {
+        width: auto;
+    }
+
+</style>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public RgfEntityParameters EntityParameters { get; set; } = null!;
+
+    private IRgManager Manager => EntityParameters.Manager!;
+    private RgfGridParameters GridParameters { get => EntityParameters.GridParameters; }
+}

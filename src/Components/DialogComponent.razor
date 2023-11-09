@@ -1,0 +1,141 @@
+﻿@inject DialogService _dialogService
+@inject IJSRuntime _jsRuntime
+
+<style>
+    div.rg-dialog > div.rz-dialog-content {
+        padding: 0;
+    }
+</style>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public RgfDialogParameters DialogParameters { get; set; } = null!;
+
+    private dynamic? _dialog;
+    private bool _isDestroyed = false;
+    private Func<bool>? _closeCallback { get; set; }
+
+    private string ThemeColor
+    {
+        get
+        {
+            switch (DialogParameters.DialogType)
+            {
+                case DialogType.Error:
+                    return "rz-background-color-danger";
+
+                case DialogType.Warning:
+                    return "rz-background-color-warning";
+
+                case DialogType.Info:
+                    return "rz-background-color-info";
+            }
+            return "";
+        }
+    }
+
+    private bool OnClose()
+    {
+        if (_isDestroyed)
+        {
+            return true;
+        }
+        bool cancel = false;
+        if (_closeCallback != null)
+        {
+            cancel = _closeCallback.Invoke() == false;
+        }
+        if (!cancel)
+        {
+            Destroy();
+        }
+        return cancel;
+    }
+
+    private void Destroy()
+    {
+        if (!_isDestroyed)
+        {
+            _dialogService.Close(_dialog);
+            _dialog = null;
+            _isDestroyed = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            _closeCallback = DialogParameters.OnClose;
+            DialogParameters.OnClose = OnClose;
+            DialogParameters.Destroy = Destroy;
+            _dialog = await _dialogService.OpenAsync(null, ds => CustomDialog, new DialogOptions()
+                {
+                    ShowTitle = true,
+                    ShowClose = false,
+                    CloseDialogOnEsc = false,
+                    CssClass = $"rg-dialog {DialogParameters.CssClass ?? ""}",
+                    Width = DialogParameters.Width ?? "auto",
+                    Height = DialogParameters.Height,
+                    Resizable = DialogParameters.Resizable ?? false,
+                    Draggable = true
+                });
+        }
+        else if (_dialog != null)
+        {
+            _dialogService.Refresh();
+        }
+    }
+
+    private RenderFragment CustomDialog => builder =>
+    {
+        int sequence = 0;
+        if (DialogParameters.NoHeader != true && DialogParameters.Header != null)
+        {
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "rz-dialog-titlebar " + ThemeColor);
+            builder.AddContent(sequence++, DialogParameters.Header);
+            builder.CloseElement();
+        }
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "rz-dialog-content");
+        builder.OpenComponent(sequence++, typeof(RadzenStack));
+        builder.AddAttribute(sequence++, nameof(RadzenStack.ChildContent), DialogParameters.Content);
+        builder.CloseComponent();
+
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "rz-mt-3");
+        if (DialogParameters.FooterTemplate != null)
+        {
+            builder.OpenElement(sequence++, "div");
+            builder.AddContent(sequence++, DialogParameters.FooterTemplate);
+            builder.CloseElement();
+        }
+        if (DialogParameters.PredefinedButtons != null)
+        {
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "rz-text-align-right");
+            builder.AddContent(sequence++, DialogParameters.FooterTemplate);
+            foreach (var button in DialogParameters.PredefinedButtons)
+            {
+                builder.OpenComponent(sequence++, typeof(RadzenButton));
+                builder.AddAttribute(sequence++, nameof(RadzenButton.ButtonStyle), ButtonStyle.Primary);
+                builder.AddAttribute(sequence++, nameof(RadzenButton.Click), EventCallback.Factory.Create<MouseEventArgs>(this, button.Callback));
+                if (!string.IsNullOrEmpty(button.ChildText))
+                {
+                    builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), (RenderFragment)((b) => b.AddContent(sequence++, button.ChildText)));
+                }
+                else if (button.ChildContent != null)
+                {
+                    builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), button.ChildContent);
+                }
+                builder.CloseComponent();
+            }
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+}

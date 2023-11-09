@@ -1,0 +1,150 @@
+﻿@if (!_initialized)
+{
+    <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate">
+        <Template>Loading menu...</Template>
+    </RadzenProgressBarCircular>
+}
+else if (_menuItems != null)
+{
+    if (Submenu)
+    {
+        foreach (var item in _menuItems)
+        {
+            @item
+        }
+    }
+    else
+    {
+        <RadzenMenu>
+            @foreach (var item in _menuItems)
+            {
+                @item
+            }
+        </RadzenMenu>
+    }
+}
+
+@inject IRecroDictService _recroDict
+@code
+{
+
+    [Parameter, EditorRequired]
+    public RgfMenuParameters MenuParameters { get; set; } = null!;
+
+    [Parameter]
+    public bool Submenu { get; set; } = false;
+
+    [Inject]
+    private IRgfMenuService _menuService { get; set; } = null!;
+
+    private bool _initialized = false;
+
+    private List<RenderFragment>? _menuItems { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (MenuParameters.MenuId != null)
+        {
+            var res = await _menuService.GetMenuAsync((int)MenuParameters.MenuId, _recroDict.DefaultLanguage);
+            if (res.Success)
+            {
+                MenuParameters.MenuItems = res.Result;
+            }
+        }
+        else
+        {
+            if (!MenuParameters.Navbar && MenuParameters.MenuItems?.Count() > 1)
+            {
+                Submenu = true;
+            }
+        }
+        _initialized = true;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (MenuParameters.MenuItems != null)
+        {
+            _menuItems = new();
+            foreach (var item in MenuParameters.MenuItems)
+            {
+                if (MenuParameters.MenuRenderCallback != null)
+                {
+                    await MenuParameters.MenuRenderCallback.Invoke(item);
+                }
+                _menuItems.Add(RenderMenuItem(item));
+            }
+        }
+    }
+
+    private RenderFragment RenderMenuItem(RgfMenu item) => builder =>
+    {
+        if (!item.Disabled && item.MenuType != RgfMenuType.Disabled)
+        {
+            int sequence = 0;
+            switch (item.MenuType)
+            {
+                case RgfMenuType.ActionLink:
+                    builder.OpenComponent(sequence++, typeof(RadzenMenuItem));
+                    builder.AddAttribute(sequence++, "class", item.CssClass);
+                    builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Path), item.Command);
+                    builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Text), item.Title);
+                    builder.CloseComponent();
+                    break;
+
+                case RgfMenuType.Function:
+                case RgfMenuType.FunctionForRec:
+                    if (MenuParameters.MenuSelectionCallback != null)
+                    {
+                        builder.OpenComponent(sequence++, typeof(RadzenMenuItem));
+                        builder.AddAttribute(sequence++, "class", item.CssClass);
+                        builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Click), EventCallback.Factory.Create<MenuItemEventArgs>(this, async (args) => await MenuParameters.MenuSelectionCallback.Invoke(item)));
+                        builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Text), item.Title);
+                        builder.CloseComponent();
+                    }
+                    break;
+
+                case RgfMenuType.Divider:
+                    if (!MenuParameters.Navbar)
+                    {
+                        builder.AddMarkupContent(sequence++, $"<hr/>");
+                    }
+                    break;
+
+                case RgfMenuType.Menu:
+                    builder.OpenComponent(sequence++, typeof(RadzenMenuItem));
+                    builder.AddAttribute(sequence++, "class", item.CssClass);
+                    if (!string.IsNullOrEmpty(item.Command))
+                    {
+                        builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Path), item.Command);
+                    }
+                    builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Text), item.Title);
+                    builder.AddAttribute(sequence++, nameof(RadzenMenuItem.ChildContent), (RenderFragment)((b) =>
+                    {
+                        b.OpenComponent(sequence++, typeof(MenuComponent));
+                        b.AddAttribute(sequence++, nameof(Submenu), true);
+                        b.AddAttribute(sequence++, nameof(MenuParameters), new RgfMenuParameters()
+                            {
+                                MenuItems = item.NestedMenu,
+                                MenuRenderCallback = MenuParameters.MenuRenderCallback,
+                                MenuSelectionCallback = MenuParameters.MenuSelectionCallback
+                            });
+                        b.CloseComponent();
+                    }));
+                    builder.CloseComponent();
+                    break;
+
+                case RgfMenuType.Custom:
+                    builder.OpenComponent(sequence++, typeof(RadzenMenuItem));
+                    builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Template), (RenderFragment)((b) =>
+                    {
+                        b.AddMarkupContent(sequence++, string.Format(item.Command, item.Title));
+                    }));
+                    builder.CloseComponent();
+                    break;
+            }
+        }
+    };
+}

@@ -1,0 +1,168 @@
+﻿
+<RgfFormItemComponent FormItemParameters="FormItemParameters">
+    <ItemTemplate Context="RgfFormItem">
+
+        @switch (PropertyDesc.FormType)
+        {
+            case PropertyFormType.TextBox:
+                if (Property.ForeignEntity != null)
+                {
+                    <RadzenTextBox @bind-Value="ItemData.StringValue"
+                                   ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                   class="@RgfFormItem.CssClass" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="search" Click="() => RgfFormItem.OnSearchEntity(ItemData.StringValue)" Style="flex:unset" />
+                }
+                else
+                {
+                    @switch (PropertyDesc.ClientDataType)
+                    {
+                        case ClientDataType.Integer:
+                            <RadzenNumeric @bind-Value="ItemData.IntValue"
+                                           TValue="int?" ShowUpDown="false"
+                                           ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                           class="@RgfFormItem.CssClass" />
+                            break;
+
+                        case ClientDataType.Decimal:
+                            <RadzenNumeric @bind-Value="ItemData.DecimalValue"
+                                           TValue="decimal?" ShowUpDown="false"
+                                           ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                           class="@RgfFormItem.CssClass" />
+                            break;
+
+                        case ClientDataType.Double:
+                            <RadzenNumeric @bind-Value="ItemData.DoubleValue"
+                                           TValue="double?" ShowUpDown="false"
+                                           ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                           class="@RgfFormItem.CssClass" />
+                            break;
+
+                        default:
+                            if (PropertyDesc.PasswordType)
+                            {
+                                <RadzenPassword @bind-Value="ItemData.StringValue"
+                                                ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                                class="@RgfFormItem.CssClass" />
+                            }
+                            else
+                            {
+                                <RadzenTextBox @bind-Value="ItemData.StringValue"
+                                               ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                               class="@RgfFormItem.CssClass" />
+                            }
+                            break;
+                    }
+                }
+                break;
+
+            case PropertyFormType.TextBoxMultiLine:
+                <RadzenTextArea @bind-Value="ItemData.StringValue"
+                                ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                class="@RgfFormItem.CssClass" />
+                break;
+
+            case PropertyFormType.CheckBox:
+            case PropertyFormType.DropDown:
+                if (PropertyDesc.FormType == PropertyFormType.CheckBox && Property.AvailableItems?.Any() != true)
+                {
+                    <div class="rz-mt-4">
+                        <RadzenCheckBox @bind-Value="ItemData.BooleanValue"
+                                        ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                        class="@RgfFormItem.CssClass" />
+                    </div>
+                }
+                else
+                {
+                    <RadzenDropDown TValue="string" @bind-Value="ItemData.StringValue" Data="Property.AvailableItems"
+                                    TextProperty="Value" ValueProperty="Key"
+                                    ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                    class="@RgfFormItem.CssClass" />
+                }
+                break;
+
+            case PropertyFormType.Date:
+                <RadzenDatePicker @bind-Value="ItemData.DateTimeValue"
+                                  TValue="DateTime?" ShowTime="false"
+                                  ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                  class="@RgfFormItem.CssClass" />
+                break;
+
+            case PropertyFormType.DateTime:
+                <RadzenDatePicker @bind-Value="ItemData.DateTimeValue"
+                                  TValue="DateTime?" ShowTime="true"
+                                  ReadOnly="Property.Readonly" Disabled="Property.Disabled"
+                                  class="@RgfFormItem.CssClass" />
+                break;
+
+            case PropertyFormType.StaticText:
+                <div class="@RgfFormItem.CssClass" style="@Property.Style">
+                    @(ItemData.StringValue)
+                </div>
+                break;
+
+            case PropertyFormType.ImageInDB:
+                <img src="@($"{ApiService.BaseAddress}{ItemData.StringValue}")" class="@RgfFormItem.CssClass" style="@Property.Style" />
+                break;
+
+            case PropertyFormType.RecroDict:
+                <div class="@RgfFormItem.CssClass" style="@Property.Style">
+                    @((MarkupString)ItemData.StringValue)
+                </div>
+                break;
+
+            case PropertyFormType.HtmlEditor:
+                <RadzenHtmlEditor @bind-Value="ItemData.StringValue"
+                                  Disabled="Property.Readonly || Property.Disabled"
+                                  class="@RgfFormItem.CssClass" />
+                break;
+
+            case PropertyFormType.RecroGrid:
+                <div class="@RgfFormItem.CssClass" style="@Property.Style">
+                    @if (this.FormComponent.FormEditMode == FormEditMode.Create)
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                @Property.Label
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @RgfEntityComponent.Create(new RgfEntityParameters(Property.ForeignEntity.EntityName, FormComponent.Manager.SessionParams) { GridId = ItemData.StringValue})
+                    }
+                </div>
+                break;
+
+            case PropertyFormType.Entity:
+            case PropertyFormType.Invalid:
+            case PropertyFormType.ListBox:
+            case PropertyFormType.Custom:
+            default:
+                break;
+        }
+
+    </ItemTemplate>
+</RgfFormItemComponent>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public RgfFormItemParameters FormItemParameters { get; set; } = null!;
+
+    [CascadingParameter]
+    public EditContext CurrentEditContext { get; set; } = null!;
+
+    protected RgfFormComponent FormComponent => FormItemParameters.FormComponent;
+    protected RgfForm.Property Property => FormItemParameters.Property;
+    protected RgfDynamicData ItemData => FormItemParameters.ItemData;
+    protected RgfProperty PropertyDesc => Property.PropertyDesc;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (FormItemParameters.Property.CssClass?.Contains("rz-mt-2") != true)
+        {
+            FormItemParameters.Property.CssClass = $"{FormItemParameters.Property.CssClass ?? ""} rz-mt-2".TrimStart();
+        }
+    }
+}

@@ -1,0 +1,35 @@
+﻿
+<RadzenDropDown @bind-Value=@ThemeName Data=@Themes TextProperty="Value" ValueProperty="Key" Change="OnThemeChange" />
+
+@inject IJSRuntime _jsRuntime
+@code {
+
+    [Parameter]
+    public string ThemeName { get; set; } = "default";
+
+    private IJSObjectReference? _module;
+
+    private List<KeyValuePair<string, string>> Themes = new() {
+        new("dark", "Dark"),
+        new("default", "Default"),
+        new("humanistic", "Humanistic"),
+        new("material", "Material"),
+        new("software", "Software"),
+        new("standard", "Standard"),
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var libName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", $"{RgfClientConfiguration.AppRootUrl}_content/{libName}/scripts/radzen-theme.js");
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void OnThemeChange(object arg)
+    {
+        _module?.InvokeVoidAsync("setTheme", arg, RgfClientConfiguration.AppRootUrl);
+    }
+}

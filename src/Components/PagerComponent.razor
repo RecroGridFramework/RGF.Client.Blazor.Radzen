@@ -1,0 +1,63 @@
+﻿<RgfPagerComponent @ref="_rgfPagerRef" EntityParameters="EntityParameters">
+    <PagerTemplate Context="RgfPager">
+        <div class="rz-paginator rz-unselectable-text rz-helper-clearfix rz-align-left ">
+            @if (RgfPager.ItemCount != 0)
+            {
+                <RadzenButton class="rz-paginator-first rz-paginator-element" Click=@OnShowFirstPage Icon="first_page" ButtonStyle="ButtonStyle.Light"
+                              Disabled="RgfPager.CurrentPage == 1" title="@RecroDict.GetRgfUiString("First")" />
+                <RadzenButton class="rz-paginator-prev rz-paginator-element" Click=@OnShowPreviousPage Icon="chevron_left" ButtonStyle="ButtonStyle.Light"
+                              Disabled="RgfPager.CurrentPage == 1" title="@RecroDict.GetRgfUiString("Prev")" />
+
+                <RadzenNumeric TValue="int" Value="@RgfPager.CurrentPage" ValueChanged="OnShowPage"
+                               ShowUpDown="false" Min="1" Max="RgfPager.TotalPages"
+                               Style="@($"width:{CalcWidth(RgfPager.CurrentPage)}")" />
+
+                <RadzenButton class="rz-paginator-next rz-paginator-element" Click=@OnShowNextPage Icon="chevron_right" ButtonStyle="ButtonStyle.Light"
+                              Disabled="RgfPager.CurrentPage >= RgfPager.TotalPages" title="@RecroDict.GetRgfUiString("Next")" />
+
+                if (RgfPager.ItemCount > 0)
+                {
+                    <RadzenButton class="rz-paginator-last rz-paginator-element" Click=@OnShowLastPage Icon="last_page" ButtonStyle="ButtonStyle.Light"
+                                  Disabled="RgfPager.CurrentPage == RgfPager.TotalPages" title="@RecroDict.GetRgfUiString("Last")" />
+
+                    <RadzenLabel class="rz-m-2" Text="@RecroDict.GetRgfUiString("PageCount")" />
+                    <RadzenNumeric TValue="int" Value="@RgfPager.TotalPages" ReadOnly="true" ShowUpDown="false" Style="@($"width:{CalcWidth(RgfPager.TotalPages)}")" />
+                    <RadzenLabel class="rz-m-2" Text="@RecroDict.GetRgfUiString("ItemCount")" />
+                    <RadzenNumeric TValue="int" Value="@RgfPager.ItemCount" ReadOnly="true" ShowUpDown="false" Style="@($"width:{CalcWidth(RgfPager.ItemCount)}")" />
+                }
+
+                if (Manager.EntityDesc.Options.GetBoolValue("RGO_ClientMode") != true)
+                {
+                    <RadzenLabel class="rz-m-2" Text="@RecroDict.GetRgfUiString("ItemsPerPage")" />
+                    <RadzenDropDown TValue="string" Value="@RgfPager.PageSize.ToString()" Data="@(new string[] { "5", "10", "15", "25" })" ValueChanged="RgfPager.PageSizeChanging"
+                                    Style="width:3.5rem" class="rz-ml-0" />
+                }
+            }
+            else
+            {
+                <RadzenLabel class="rz-m-2" Text="@RecroDict.GetRgfUiString("ItemCount")" />
+                <RadzenNumeric TValue="int" Value="@RgfPager.ItemCount" ReadOnly="true" ShowUpDown="false" Style="@($"width:{CalcWidth(RgfPager.ItemCount)}")" />
+            }
+        </div>
+    </PagerTemplate>
+</RgfPagerComponent>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public RgfEntityParameters EntityParameters { get; set; } = null!;
+
+    private IRgManager Manager => EntityParameters.Manager!;
+    private RgfPagerParameters PagerParameters { get => EntityParameters.PagerParameters; }
+    private IRecroDictService RecroDict => Manager.RecroDict;
+
+    private RgfPagerComponent _rgfPagerRef { get; set; } = null!;
+
+    private void OnShowFirstPage(MouseEventArgs args) => _rgfPagerRef.PageChanging(1);
+    private void OnShowNextPage(MouseEventArgs args) => _rgfPagerRef.PageChanging(_rgfPagerRef.CurrentPage + 1);
+    private void OnShowPreviousPage(MouseEventArgs args) => _rgfPagerRef.PageChanging(_rgfPagerRef.CurrentPage - 1);
+    private void OnShowLastPage(MouseEventArgs args) => _rgfPagerRef.PageChanging(_rgfPagerRef.TotalPages);
+    private void OnShowPage(int page) => _rgfPagerRef.PageChanging(page);
+
+    private string CalcWidth(int page) => page < 100 ? "54px" : page < 1E4 ? "74px" : "114px";
+}
