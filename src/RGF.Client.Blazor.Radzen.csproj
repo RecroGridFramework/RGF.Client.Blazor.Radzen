@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Recrovit.RecroGridFramework.Client.Blazor.RadzenUI</RootNamespace>
@@ -12,8 +12,10 @@
     <Company>Recrovit Kft.</Company>
     <Product>RecroGrid Framework Client Blazor Radzen</Product>
     <Copyright>© Recrovit Kft. All rights reserved.</Copyright>
-    <Version>7.0.0-preview</Version>
+    <Version>8.0.0-preview</Version>
     <FileVersion>$(Version).1$([System.DateTime]::Now.ToString(MMdd))</FileVersion>
+    <InformationalVersion>$(FileVersion)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -27,26 +29,26 @@
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Radzen.Blazor" Version="4.14.4" />
-    <PackageReference Include="Recrovit.RecroGridFramework.Client.Blazor" Version="7.0.0-preview" Condition="'$(Configuration)'=='Release'" />
+    <PackageReference Include="Radzen.Blazor" Version="4.21.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\RGF.Client.Blazor\src\RGF.Client.Blazor.csproj" Condition="'$(Configuration)'=='Debug'" />
+  <ItemGroup Condition="'$(Configuration)'=='Release'" >
+    <PackageReference Include="Recrovit.RecroGridFramework.Client.Blazor" Version="8.0.0-preview" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Debug'" >
+    <ProjectReference Include="..\..\RGF.Client.Blazor\src\RGF.Client.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <None Include="..\README.*" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
