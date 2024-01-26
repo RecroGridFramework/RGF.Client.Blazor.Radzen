@@ -1,5 +1,5 @@
 ﻿
-<RgfFormComponent @ref="_rgfFormRef" EntityParameters="EntityParameters"
+<RgfFormComponent @ref="_rgfFormRef" EntityParameters="EntityParameters" FormComponent="this"
                   FormGroupLayoutTemplate="FormGroupLayoutTemplate"
                   FormItemLayoutTemplate="FormItemLayoutTemplate">
     <FormTemplate Context="RgfForm">
@@ -36,7 +36,6 @@
             </div>
         </div>
     </FormValidationTemplate>
-
 </RgfFormComponent>
 
 @inject IJSRuntime _jsRuntime
@@ -61,28 +60,28 @@
     public RenderFragment<RgfFormGroupLayoutParameters> FormGroupLayoutTemplate => (param) =>
     @<RadzenRow AlignItems="AlignItems.Center" Gap="3rem" class="rz-mt-2">
         @foreach (var prop in param.FormGroup.Properties)
-        {
-            @param.BaseFormComponent.GetFormItemLayoutTemplate(new RgfFormItemParameters(_rgfFormRef, param.FormGroup, prop))
-        }
+    {
+        @param.BaseFormComponent.GetFormItemLayoutTemplate(new RgfFormItemParameters(_rgfFormRef, param.FormGroup, prop))
+    }
     </RadzenRow>;
 
     public RenderFragment<RgfFormItemParameters> FormItemLayoutTemplate => (param) =>
     @<RadzenColumn Size="@(param.Property.FlexColumnWidth ?? param.Group.FlexColumnWidth)">
         @if (!string.IsNullOrEmpty(param.Property.PreElement))
-        {
-            @((MarkupString)param.Property.PreElement)
-        }
+    {
+        @((MarkupString)param.Property.PreElement)
+    }
         @if (param.Property.EmbededGrid || param.Property.NoLabel)
-        {
-            <div name="@param.Property.ClientName" style="width: 100%;">
-                @param.BaseFormComponent.GetFormItemTemplate(param)
-            </div>
-        }
-        else
-        {
-            <RadzenFormField Text="@param.Property.Label" Variant="Variant.Text" name="@param.Property.ClientName" Style="width: 100%;">
-                @param.BaseFormComponent.GetFormItemTemplate(param)
-            </RadzenFormField>
-        }
+    {
+        <div name="@param.Property.ClientName" style="width: 100%;">
+            @param.BaseFormComponent.GetFormItemTemplate(param)
+        </div>
+    }
+    else
+    {
+        <RadzenFormField Text="@param.Property.Label" Variant="Variant.Text" name="@param.Property.ClientName" Style="width: 100%;">
+            @param.BaseFormComponent.GetFormItemTemplate(param)
+        </RadzenFormField>
+    }
     </RadzenColumn>;
 }
