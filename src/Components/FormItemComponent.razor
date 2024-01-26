@@ -126,9 +126,9 @@
                             </div>
                         </div>
                     }
-                    else
+                    else @*The Radzen does not support dynamic modification associated with tab switching. if (FormComponent.PreviouslyActiveTabs.Contains(PropertyDesc.FormTab - 1) || FormComponent.ActiveTabIndex == PropertyDesc.FormTab - 1) *@
                     {
-                        @RgfEntityComponent.Create(new RgfEntityParameters(Property.ForeignEntity.EntityName, BaseFormComponent.Manager.SessionParams) { GridId = ItemData.StringValue})
+                        @RgfEntityComponent.Create(new RgfEntityParameters(Property.ForeignEntity.EntityName, BaseFormComponent.Manager.SessionParams) { GridId = ItemData.StringValue })
                     }
                 </div>
                 break;
@@ -153,6 +153,7 @@
     public EditContext CurrentEditContext { get; set; } = null!;
 
     protected RgfFormComponent BaseFormComponent => FormItemParameters.BaseFormComponent;
+    protected FormComponent FormComponent => (FormComponent)FormItemParameters.BaseFormComponent.FormComponent;
     protected RgfForm.Property Property => FormItemParameters.Property;
     protected RgfDynamicData ItemData => FormItemParameters.ItemData;
     protected RgfProperty PropertyDesc => Property.PropertyDesc;

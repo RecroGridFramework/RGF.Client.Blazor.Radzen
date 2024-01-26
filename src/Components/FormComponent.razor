@@ -4,7 +4,7 @@
                   FormItemLayoutTemplate="FormItemLayoutTemplate">
     <FormTemplate Context="RgfForm">
         <EditForm EditContext="RgfForm.CurrentEditContext">
-            <RadzenTabs RenderMode="TabRenderMode.Server">
+            <RadzenTabs RenderMode="TabRenderMode.Client" @bind-SelectedIndex="ActiveTabIndex" Change="(arg) => PreviouslyActiveTabs.Add(arg)">
                 <Tabs>
                     @foreach (var tab in RgfForm.FormData.FormTabs)
                     {
@@ -49,6 +49,8 @@
     protected IRecroDictService RecroDict => Manager.RecroDict;
 
     private RgfFormComponent _rgfFormRef { get; set; } = null!;
+    public int ActiveTabIndex { get; set; } = 0;
+    public HashSet<int> PreviouslyActiveTabs { get; private set; } = new() { 0 };
 
     protected override void OnInitialized()
     {
