@@ -3,12 +3,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
-using Recrovit.RecroGridFramework.Abstraction.Infrastructure.Events;
+using Recrovit.RecroGridFramework.Abstraction.Contracts.Services;
 using Recrovit.RecroGridFramework.Abstraction.Models;
 using Recrovit.RecroGridFramework.Client.Blazor.Components;
+using Recrovit.RecroGridFramework.Client.Blazor.Events;
 using Recrovit.RecroGridFramework.Client.Handlers;
-using System;
-using System.Linq;
 
 namespace Recrovit.RecroGridFramework.Client.Blazor.RadzenUI.Components;
 
@@ -33,8 +32,8 @@ public partial class GridComponent : ComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        GridParameters.Events.CreateAttributes.Subscribe(OnCreateAttributes);
-        GridParameters.Events.ColumnSettingsChanged.Subscribe((arg) => Recreate());
+        GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.CreateAttributes, OnCreateAttributes);
+        GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.ColumnSettingsChanged, (arg) => Recreate());
         _initialized = true;
     }
 
@@ -112,11 +111,12 @@ public partial class GridComponent : ComponentBase
         });
     }
 
-    protected virtual Task OnCreateAttributes(DataEventArgs<RgfDynamicDictionary> rowData)
+    protected virtual Task OnCreateAttributes(IRgfEventArgs<RgfGridEventArgs> ars)
     {
+        var rowData = ars.Args.RowData ?? throw new ArgumentException();
         foreach (var prop in EntityDesc.SortedVisibleColumns)
         {
-            var attr = rowData.Value["__attributes"] as RgfDynamicDictionary;
+            var attr = rowData["__attributes"] as RgfDynamicDictionary;
             if (attr != null)
             {
                 string? propAttr = null;
