@@ -39,14 +39,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Radzen.Blazor" Version="4.21.3" />
+    <PackageReference Include="Radzen.Blazor" Version="4.24.6" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Release'" >
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
     <PackageReference Include="Recrovit.RecroGridFramework.Client.Blazor" Version="8.2.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Debug'" >
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
     <ProjectReference Include="..\..\RGF.Client.Blazor\src\RGF.Client.Blazor.csproj" />
   </ItemGroup>
 
