@@ -1,10 +1,10 @@
 ﻿
-<RgfFormComponent @ref="_rgfFormRef" EntityParameters="EntityParameters"
+<RgfFormComponent @ref="_rgfFormRef" EntityParameters="EntityParameters" FormComponent="this"
                   FormGroupLayoutTemplate="FormGroupLayoutTemplate"
                   FormItemLayoutTemplate="FormItemLayoutTemplate">
     <FormTemplate Context="RgfForm">
         <EditForm EditContext="RgfForm.CurrentEditContext">
-            <RadzenTabs RenderMode="TabRenderMode.Server">
+            <RadzenTabs RenderMode="TabRenderMode.Client" @bind-SelectedIndex="ActiveTabIndex" Change="(arg) => PreviouslyActiveTabs.Add(arg)">
                 <Tabs>
                     @foreach (var tab in RgfForm.FormData.FormTabs)
                     {
@@ -36,7 +36,6 @@
             </div>
         </div>
     </FormValidationTemplate>
-
 </RgfFormComponent>
 
 @inject IJSRuntime _jsRuntime
@@ -50,6 +49,8 @@
     protected IRecroDictService RecroDict => Manager.RecroDict;
 
     private RgfFormComponent _rgfFormRef { get; set; } = null!;
+    public int ActiveTabIndex { get; set; } = 0;
+    public HashSet<int> PreviouslyActiveTabs { get; private set; } = new() { 0 };
 
     protected override void OnInitialized()
     {
@@ -61,28 +62,28 @@
     public RenderFragment<RgfFormGroupLayoutParameters> FormGroupLayoutTemplate => (param) =>
     @<RadzenRow AlignItems="AlignItems.Center" Gap="3rem" class="rz-mt-2">
         @foreach (var prop in param.FormGroup.Properties)
-        {
-            @param.FormComponent.GetFormItemLayoutTemplate(new RgfFormItemParameters(_rgfFormRef, param.FormGroup, prop))
-        }
+    {
+        @param.BaseFormComponent.GetFormItemLayoutTemplate(new RgfFormItemParameters(_rgfFormRef, param.FormGroup, prop))
+    }
     </RadzenRow>;
 
     public RenderFragment<RgfFormItemParameters> FormItemLayoutTemplate => (param) =>
     @<RadzenColumn Size="@(param.Property.FlexColumnWidth ?? param.Group.FlexColumnWidth)">
         @if (!string.IsNullOrEmpty(param.Property.PreElement))
-        {
-            @((MarkupString)param.Property.PreElement)
-        }
+    {
+        @((MarkupString)param.Property.PreElement)
+    }
         @if (param.Property.EmbededGrid || param.Property.NoLabel)
-        {
-            <div name="@param.Property.ClientName" style="width: 100%;">
-                @param.FormComponent.GetFormItemTemplate(param)
-            </div>
-        }
-        else
-        {
-            <RadzenFormField Text="@param.Property.Label" Variant="Variant.Text" name="@param.Property.ClientName" Style="width: 100%;">
-                @param.FormComponent.GetFormItemTemplate(param)
-            </RadzenFormField>
-        }
+    {
+        <div name="@param.Property.ClientName" style="width: 100%;">
+            @param.BaseFormComponent.GetFormItemTemplate(param)
+        </div>
+    }
+    else
+    {
+        <RadzenFormField Text="@param.Property.Label" Variant="Variant.Text" name="@param.Property.ClientName" Style="width: 100%;">
+            @param.BaseFormComponent.GetFormItemTemplate(param)
+        </RadzenFormField>
+    }
     </RadzenColumn>;
 }

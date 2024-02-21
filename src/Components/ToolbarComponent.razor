@@ -3,6 +3,14 @@
     <ToolbarTemplate Context="RgfToolbar">
         <div class="rz-paginator rz-unselectable-text rz-helper-clearfix">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="6px" Wrap="FlexWrap.Wrap">
+                @if (RgfToolbar.CustomMenu != null)
+                {
+                    <RadzenMenu>
+                        <RadzenMenuItem title="@RecroDict.GetRgfUiString("CustomFunctions")" Icon="list" class="rz-button rz-light">
+                            @RgfToolbar.CustomMenu
+                        </RadzenMenuItem>
+                    </RadzenMenu>
+                }
                 @if (Manager.EntityDesc.Options.GetBoolValue("RGO_ClientMode") != true)
                 {
                     <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Refresh")" Icon="refresh"

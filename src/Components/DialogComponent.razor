@@ -73,7 +73,7 @@
             _closeCallback = DialogParameters.OnClose;
             DialogParameters.OnClose = OnClose;
             DialogParameters.Destroy = Destroy;
-            _dialog = await _dialogService.OpenAsync(null, ds => CustomDialog, new DialogOptions()
+            _dialog = await _dialogService.OpenAsync((string?)null, ds => CustomDialog, new DialogOptions()
                 {
                     ShowTitle = true,
                     ShowClose = false,

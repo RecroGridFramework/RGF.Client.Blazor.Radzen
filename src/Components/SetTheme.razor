@@ -23,13 +23,13 @@
         if (firstRender)
         {
             var libName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
-            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", $"{RgfClientConfiguration.AppRootUrl}_content/{libName}/scripts/radzen-theme.js");
+            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", $"{RgfClientConfiguration.AppRootPath}_content/{libName}/scripts/radzen-theme.js");
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
     private void OnThemeChange(object arg)
     {
-        _module?.InvokeVoidAsync("setTheme", arg, RgfClientConfiguration.AppRootUrl);
+        _module?.InvokeVoidAsync("setTheme", arg, RgfClientConfiguration.AppRootPath);
     }
 }
