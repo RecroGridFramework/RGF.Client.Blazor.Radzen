@@ -32,7 +32,7 @@ public partial class GridComponent : ComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.CreateAttributes, OnCreateAttributes);
+        GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.CreateRowData, OnCreateAttributes);
         GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.ColumnSettingsChanged, (arg) => Recreate());
         _initialized = true;
     }
