@@ -59,6 +59,25 @@
         FormParameters.ModifiedCssClass = FormParameters.ModifiedCssClass ?? "";
     }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        var rowIndex = FormParameters.FormViewKey.RowIndex;
+        if (rowIndex != -1)
+        {
+            var buttons = new List<ButtonParameters>() {
+                new("first_page", RecroDict.GetRgfUiString("First"), async (arg) => await _rgfFormRef.FirstFormItemAsync()) { Disabled = rowIndex <= 0 },
+                new("chevron_left", RecroDict.GetRgfUiString("Prev"), async (arg) => await _rgfFormRef.PrevFormItemAsync()) { Disabled = rowIndex <= 0 },
+                new("chevron_right", RecroDict.GetRgfUiString("Next"), async (arg) => await _rgfFormRef.NextFormItemAsync()) { Disabled = rowIndex + 1 >= Manager.ItemCount.Value },
+                new("last_page", RecroDict.GetRgfUiString("Last"), async (arg) => await _rgfFormRef.LastFormItemAsync()) { Disabled = rowIndex + 1 >= Manager.ItemCount.Value } };
+            FormParameters.DialogParameters.LeftButtons = buttons;
+        }
+        else
+        {
+            FormParameters.DialogParameters.LeftButtons = null;
+        }
+    }
+
     public RenderFragment<RgfFormGroupLayoutParameters> FormGroupLayoutTemplate => (param) =>
     @<RadzenRow AlignItems="AlignItems.Center" Gap="3rem" class="rz-mt-2">
         @foreach (var prop in param.FormGroup.Properties)
