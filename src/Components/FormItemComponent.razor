@@ -10,7 +10,7 @@
                     <RadzenTextBox @bind-Value="ItemData.StringValue"
                                    ReadOnly="Property.Readonly" Disabled="Property.Disabled"
                                    class="@RgfFormItem.CssClass" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="search" Click="() => RgfFormItem.OnSearchEntity(ItemData.StringValue)" Style="flex:unset" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="search" Click="async () => await RgfFormItem.FindEntityAsync(ItemData.StringValue)" Style="flex:unset" />
                 }
                 else
                 {
