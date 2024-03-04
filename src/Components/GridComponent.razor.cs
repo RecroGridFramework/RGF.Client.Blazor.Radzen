@@ -6,7 +6,7 @@ using Radzen.Blazor;
 using Recrovit.RecroGridFramework.Abstraction.Contracts.Services;
 using Recrovit.RecroGridFramework.Abstraction.Models;
 using Recrovit.RecroGridFramework.Client.Blazor.Components;
-using Recrovit.RecroGridFramework.Client.Blazor.Events;
+using Recrovit.RecroGridFramework.Client.Events;
 using Recrovit.RecroGridFramework.Client.Handlers;
 
 namespace Recrovit.RecroGridFramework.Client.Blazor.RadzenUI.Components;
@@ -32,8 +32,8 @@ public partial class GridComponent : ComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.CreateRowData, OnCreateAttributes);
-        GridParameters.EventDispatcher.Subscribe(RgfGridEventKind.ColumnSettingsChanged, (arg) => Recreate());
+        GridParameters.EventDispatcher.Subscribe(RgfListEventKind.CreateRowData, OnCreateAttributes);
+        GridParameters.EventDispatcher.Subscribe(RgfListEventKind.ColumnSettingsChanged, (arg) => Recreate());
         _initialized = true;
     }
 
@@ -111,10 +111,10 @@ public partial class GridComponent : ComponentBase
         });
     }
 
-    protected virtual Task OnCreateAttributes(IRgfEventArgs<RgfGridEventArgs> ars)
+    protected virtual Task OnCreateAttributes(IRgfEventArgs<RgfListEventArgs> ars)
     {
         _logger.LogDebug("CreateAttributes");
-        var rowData = ars.Args.RowData ?? throw new ArgumentException();
+        var rowData = ars.Args.Data ?? throw new ArgumentException();
         foreach (var prop in EntityDesc.SortedVisibleColumns)
         {
             string? propClass = null;
