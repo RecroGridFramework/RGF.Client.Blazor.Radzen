@@ -1,5 +1,4 @@
-﻿
-<RgfToolbarComponent @ref="_rgfToolbarRef" EntityParameters="EntityParameters">
+﻿<RgfToolbarComponent @ref="_rgfToolbarRef" EntityParameters="EntityParameters">
     <ToolbarTemplate Context="RgfToolbar">
         <div class="rz-paginator rz-unselectable-text rz-helper-clearfix">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="6px" Wrap="FlexWrap.Wrap">
@@ -14,12 +13,12 @@
                 @if (Manager.EntityDesc.Options.GetBoolValue("RGO_ClientMode") != true)
                 {
                     <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Refresh")" Icon="refresh"
-                                  Click="() => RgfToolbar.OnToolbarCommand(ToolbarAction.Refresh)" />
+                                  Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.Refresh)" />
 
                     @if (Manager.EntityDesc.Options.GetBoolValue("RGO_NoFilter") != true)
                     {
                         <RadzenButton ButtonStyle="RgfToolbar.IsFiltered ? ButtonStyle.Info : ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Filter")" Icon="filter_alt"
-                                      Click="() => RgfToolbar.OnToolbarCommand(ToolbarAction.ShowFilter)" />
+                                      Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.ShowFilter)" />
                     }
                 }
                 @if (Manager.EntityDesc.Options.GetBoolValue("RGO_NoDetails") != true)
@@ -27,17 +26,17 @@
                     @if (RgfToolbar.BasePermissions.Add)
                     {
                         <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("New")" Icon="add"
-                                      Click="() => RgfToolbar.OnToolbarCommand(ToolbarAction.Add)" />
+                                      Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.Add)" />
                     }
                     @if (RgfToolbar.BasePermissions.Edit)
                     {
                         <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Modify")" Icon="edit" Disabled="@(!RgfToolbar.IsSingleSelectedRow)"
-                                      Click="() => RgfToolbar.OnToolbarCommand(ToolbarAction.Edit)" />
+                                      Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.Edit)" />
                     }
                     else if (RgfToolbar.BasePermissions.Read)
                     {
                         <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Details")" Icon="menu_book" Disabled="@(!RgfToolbar.IsSingleSelectedRow)"
-                                      Click="() => RgfToolbar.OnToolbarCommand(ToolbarAction.Read)" />
+                                      Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.Read)" />
                     }
                 }
                 @if (RgfToolbar.BasePermissions.Delete)
@@ -56,13 +55,14 @@
                 @if (RgfToolbar.SelectParam != null && Manager.EntityDesc.Options.GetBoolValue("RGO_SelectMode") == true)
                 {
                     <RadzenButton ButtonStyle="ButtonStyle.Success" title="@RecroDict.GetRgfUiString("Select")" Icon="check" Disabled="@(!RgfToolbar.IsSingleSelectedRow)"
-                                  Click="() => RgfToolbar.OnToolbarCommand(ToolbarAction.Select)" />
+                                  Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.Select)" />
                 }
             </RadzenStack>
         </div>
     </ToolbarTemplate>
 </RgfToolbarComponent>
 
+@inject IRecroDictService RecroDict
 @code {
 
     [Parameter, EditorRequired]
@@ -70,7 +70,6 @@
 
     private IRgManager Manager => EntityParameters.Manager!;
     private RgfToolbarParameters ToolbarParameters { get => EntityParameters.ToolbarParameters; }
-    private IRecroDictService RecroDict => Manager.RecroDict;
 
     private RgfToolbarComponent _rgfToolbarRef { get; set; } = null!;
 }

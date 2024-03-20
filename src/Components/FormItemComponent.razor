@@ -10,7 +10,7 @@
                     <RadzenTextBox @bind-Value="ItemData.StringValue"
                                    ReadOnly="Property.Readonly" Disabled="Property.Disabled"
                                    class="@RgfFormItem.CssClass" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="search" Click="() => RgfFormItem.OnSearchEntity(ItemData.StringValue)" Style="flex:unset" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="search" Click="async () => await RgfFormItem.FindEntityAsync(ItemData.StringValue)" Style="flex:unset" />
                 }
                 else
                 {
@@ -128,7 +128,11 @@
                     }
                     else @*The Radzen does not support dynamic modification associated with tab switching. if (FormComponent.PreviouslyActiveTabs.Contains(PropertyDesc.FormTab - 1) || FormComponent.ActiveTabIndex == PropertyDesc.FormTab - 1) *@
                     {
-                        @RgfEntityComponent.Create(new RgfEntityParameters(Property.ForeignEntity.EntityName, BaseFormComponent.Manager.SessionParams) { GridId = ItemData.StringValue })
+                        if (_embeddedGrid == null)
+                        {
+                            _embeddedGrid = RgfEntityComponent.Create(new RgfEntityParameters(Property.ForeignEntity.EntityName, BaseFormComponent.Manager.SessionParams) { GridId = ItemData.StringValue });
+                        }
+                        @_embeddedGrid
                     }
                 </div>
                 break;
@@ -156,7 +160,9 @@
     protected FormComponent FormComponent => (FormComponent)FormItemParameters.BaseFormComponent.FormComponent;
     protected RgfForm.Property Property => FormItemParameters.Property;
     protected RgfDynamicData ItemData => FormItemParameters.ItemData;
+
     protected RgfProperty PropertyDesc => Property.PropertyDesc;
+    private RenderFragment? _embeddedGrid;
 
     protected override void OnInitialized()
     {

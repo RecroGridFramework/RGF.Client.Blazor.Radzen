@@ -1,5 +1,4 @@
-﻿
-<RgfFormComponent @ref="_rgfFormRef" EntityParameters="EntityParameters" FormComponent="this"
+﻿<RgfFormComponent @ref="_rgfFormRef" EntityParameters="EntityParameters" FormComponent="this"
                   FormGroupLayoutTemplate="FormGroupLayoutTemplate"
                   FormItemLayoutTemplate="FormItemLayoutTemplate">
     <FormTemplate Context="RgfForm">
@@ -39,6 +38,7 @@
 </RgfFormComponent>
 
 @inject IJSRuntime _jsRuntime
+@inject IRecroDictService RecroDict
 @code {
 
     [Parameter, EditorRequired]
@@ -46,7 +46,6 @@
 
     private IRgManager Manager => EntityParameters.Manager!;
     private RgfFormParameters FormParameters { get => EntityParameters.FormParameters; }
-    protected IRecroDictService RecroDict => Manager.RecroDict;
 
     private RgfFormComponent _rgfFormRef { get; set; } = null!;
     public int ActiveTabIndex { get; set; } = 0;
@@ -57,6 +56,25 @@
         base.OnInitialized();
         FormParameters.ErrorCssClass = FormParameters.ErrorCssClass ?? "rz-messages-error";
         FormParameters.ModifiedCssClass = FormParameters.ModifiedCssClass ?? "";
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        var rowIndex = FormParameters.FormViewKey.RowIndex;
+        if (rowIndex != -1)
+        {
+            var buttons = new List<ButtonParameters>() {
+                new("first_page", RecroDict.GetRgfUiString("First"), async (arg) => await _rgfFormRef.FirstFormItemAsync()) { Disabled = rowIndex <= 0 },
+                new("chevron_left", RecroDict.GetRgfUiString("Prev"), async (arg) => await _rgfFormRef.PrevFormItemAsync()) { Disabled = rowIndex <= 0 },
+                new("chevron_right", RecroDict.GetRgfUiString("Next"), async (arg) => await _rgfFormRef.NextFormItemAsync()) { Disabled = rowIndex + 1 >= Manager.ItemCount.Value },
+                new("last_page", RecroDict.GetRgfUiString("Last"), async (arg) => await _rgfFormRef.LastFormItemAsync()) { Disabled = rowIndex + 1 >= Manager.ItemCount.Value } };
+            FormParameters.DialogParameters.LeftButtons = buttons;
+        }
+        else
+        {
+            FormParameters.DialogParameters.LeftButtons = null;
+        }
     }
 
     public RenderFragment<RgfFormGroupLayoutParameters> FormGroupLayoutTemplate => (param) =>

@@ -1,4 +1,5 @@
-﻿@inject DialogService _dialogService
+﻿@using Microsoft.AspNetCore.Components.Rendering
+@inject DialogService _dialogService
 @inject IJSRuntime _jsRuntime
 
 <style>
@@ -17,7 +18,7 @@
     private dynamic? _dialog;
     private bool _isDestroyed = false;
     private Func<bool>? _closeCallback { get; set; }
- 
+
     private string ThemeColor
     {
         get
@@ -91,6 +92,12 @@
         }
     }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _dialogService?.Refresh();
+    }
+
     private RenderFragment CustomDialog => builder =>
     {
         int sequence = 0;
@@ -115,29 +122,54 @@
             builder.AddContent(sequence++, DialogParameters.FooterTemplate);
             builder.CloseElement();
         }
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "d-flex flex-wrap justify-content-between align-items-center");
+        if (DialogParameters.LeftButtons != null)
+        {
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "class", "d-flex justify-content-start");
+            foreach (var button in DialogParameters.LeftButtons)
+            {
+                sequence = RenderButton(sequence, builder, button);
+            }
+            builder.CloseElement();
+        }
         if (DialogParameters.PredefinedButtons != null)
         {
             builder.OpenElement(sequence++, "div");
-            builder.AddAttribute(sequence++, "class", "rz-text-align-right");
-            builder.AddContent(sequence++, DialogParameters.FooterTemplate);
+            builder.AddAttribute(sequence++, "class", "d-flex justify-content-end");
             foreach (var button in DialogParameters.PredefinedButtons)
             {
-                builder.OpenComponent(sequence++, typeof(RadzenButton));
-                builder.AddAttribute(sequence++, nameof(RadzenButton.ButtonStyle), ButtonStyle.Primary);
-                builder.AddAttribute(sequence++, nameof(RadzenButton.Click), EventCallback.Factory.Create<MouseEventArgs>(this, button.Callback));
-                if (!string.IsNullOrEmpty(button.ChildText))
-                {
-                    builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), (RenderFragment)((b) => b.AddContent(sequence++, button.ChildText)));
-                }
-                else if (button.ChildContent != null)
-                {
-                    builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), button.ChildContent);
-                }
-                builder.CloseComponent();
+                sequence = RenderButton(sequence, builder, button);
             }
             builder.CloseElement();
         }
         builder.CloseElement();
         builder.CloseElement();
+        builder.CloseElement();
     };
+
+    private int RenderButton(int sequence, RenderTreeBuilder builder, ButtonParameters button)
+    {
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "p-1");
+        builder.OpenComponent(sequence++, typeof(RadzenButton));
+        builder.AddAttribute(sequence++, "title", button.Title);
+        //builder.AddAttribute(sequence++, , button.CssClass);
+        builder.AddAttribute(sequence++, nameof(RadzenButton.ButtonStyle), button.IsPrimary ? ButtonStyle.Primary : ButtonStyle.Light);
+        builder.AddAttribute(sequence++, nameof(RadzenButton.Icon), button.IconName);
+        builder.AddAttribute(sequence++, nameof(RadzenButton.Disabled), button.Disabled);
+        builder.AddAttribute(sequence++, nameof(RadzenButton.Click), EventCallback.Factory.Create<MouseEventArgs>(this, button.Callback));
+        if (!string.IsNullOrEmpty(button.ChildText))
+        {
+            builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), (RenderFragment)((b) => b.AddContent(sequence++, button.ChildText)));
+        }
+        else if (button.ChildContent != null)
+        {
+            builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), button.ChildContent);
+        }
+        builder.CloseComponent();
+        builder.CloseElement();
+        return sequence;
+    }
 }
