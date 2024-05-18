@@ -123,9 +123,10 @@ else if (_menuItems != null)
                     builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Text), item.Title);
                     builder.AddAttribute(sequence++, nameof(RadzenMenuItem.ChildContent), (RenderFragment)((b) =>
                     {
-                        b.OpenComponent(sequence++, typeof(MenuComponent));
-                        b.AddAttribute(sequence++, nameof(Submenu), true);
-                        b.AddAttribute(sequence++, nameof(MenuParameters), new RgfMenuParameters()
+                        int sequence2 = 0;
+                        b.OpenComponent(sequence2++, typeof(MenuComponent));
+                        b.AddAttribute(sequence2++, nameof(Submenu), true);
+                        b.AddAttribute(sequence2++, nameof(MenuComponent.MenuParameters), new RgfMenuParameters()
                             {
                                 MenuItems = item.NestedMenu,
                                 MenuRenderCallback = MenuParameters.MenuRenderCallback,
@@ -140,7 +141,7 @@ else if (_menuItems != null)
                     builder.OpenComponent(sequence++, typeof(RadzenMenuItem));
                     builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Template), (RenderFragment)((b) =>
                     {
-                        b.AddMarkupContent(sequence++, string.Format(item.Command, item.Title));
+                        b.AddMarkupContent(0, string.Format(item.Command, item.Title));
                     }));
                     builder.CloseComponent();
                     break;

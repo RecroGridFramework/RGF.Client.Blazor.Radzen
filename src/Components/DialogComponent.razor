@@ -124,16 +124,18 @@
         }
         builder.OpenElement(sequence++, "div");
         builder.AddAttribute(sequence++, "class", "d-flex flex-wrap justify-content-between align-items-center");
+
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "d-flex justify-content-start");
         if (DialogParameters.LeftButtons != null)
         {
-            builder.OpenElement(sequence++, "div");
-            builder.AddAttribute(sequence++, "class", "d-flex justify-content-start");
             foreach (var button in DialogParameters.LeftButtons)
             {
                 sequence = RenderButton(sequence, builder, button);
             }
-            builder.CloseElement();
         }
+        builder.CloseElement();
+
         if (DialogParameters.PredefinedButtons != null)
         {
             builder.OpenElement(sequence++, "div");
@@ -162,7 +164,7 @@
         builder.AddAttribute(sequence++, nameof(RadzenButton.Click), EventCallback.Factory.Create<MouseEventArgs>(this, button.Callback));
         if (!string.IsNullOrEmpty(button.ChildText))
         {
-            builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), (RenderFragment)((b) => b.AddContent(sequence++, button.ChildText)));
+            builder.AddAttribute(sequence++, nameof(RadzenButton.ChildContent), (RenderFragment)((b) => b.AddContent(0, button.ChildText)));
         }
         else if (button.ChildContent != null)
         {
