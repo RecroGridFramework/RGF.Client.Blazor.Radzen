@@ -86,20 +86,22 @@
     </RadzenRow>;
 
     public RenderFragment<RgfFormItemParameters> FormItemLayoutTemplate => (param) =>
-    @<RadzenColumn Size="@(param.Property.FlexColumnWidth ?? param.Group.FlexColumnWidth)">
+    @<RadzenColumn Size="@(param.Property.FlexColumnWidth ?? param.Group.FlexColumnWidth)"
+                       class="@($"{(param.Property.EmbededGrid ? "rg-collection" : "rg-property")}")"
+                       name="@param.Property.ClientName">
         @if (!string.IsNullOrEmpty(param.Property.PreElement))
     {
         @((MarkupString)param.Property.PreElement)
     }
         @if (param.Property.EmbededGrid || param.Property.NoLabel)
     {
-        <div name="@param.Property.ClientName" style="width: 100%;">
+        <div style="width: 100%;">
             @param.BaseFormComponent.GetFormItemTemplate(param)
         </div>
     }
     else
     {
-        <RadzenFormField Text="@param.Property.Label" Variant="Variant.Text" name="@param.Property.ClientName" Style="width: 100%;">
+        <RadzenFormField Text="@param.Property.Label" Variant="Variant.Text" Style="width: 100%;">
             @param.BaseFormComponent.GetFormItemTemplate(param)
         </RadzenFormField>
     }
