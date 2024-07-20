@@ -3,7 +3,8 @@
                     GridTemplate="GridTemplate"
                     FilterTemplate="FilterTemplate"
                     PagerTemplate="PagerTemplate"
-                    FormTemplate="FormTemplate">
+                    FormTemplate="FormTemplate"
+                    ChartTemplate="ChartTemplate!">
     <LoadingIndicator>
         <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate">
             <Template>Loading...</Template>
@@ -30,4 +31,7 @@
 
     [Parameter]
     public RenderFragment<RgfEntityParameters> FormTemplate { get; set; } = (context) => @<Recrovit.RecroGridFramework.Client.Blazor.RadzenUI.Components.FormComponent EntityParameters="context" />;
+
+    [Parameter]
+    public RenderFragment<RgfEntityParameters>? ChartTemplate { get; set; }
 }
