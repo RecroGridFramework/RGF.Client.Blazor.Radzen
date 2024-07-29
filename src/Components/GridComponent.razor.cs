@@ -11,7 +11,7 @@ using Recrovit.RecroGridFramework.Client.Handlers;
 
 namespace Recrovit.RecroGridFramework.Client.Blazor.RadzenUI.Components;
 
-public partial class GridComponent : ComponentBase
+public partial class GridComponent : ComponentBase, IDisposable
 {
     [Inject]
     private ILogger<GridComponent> _logger { get; set; } = default!;
@@ -33,16 +33,13 @@ public partial class GridComponent : ComponentBase
     {
         base.OnInitialized();
         GridParameters.EventDispatcher.Subscribe(RgfListEventKind.CreateRowData, OnCreateAttributes);
-        GridParameters.EventDispatcher.Subscribe(RgfListEventKind.ColumnSettingsChanged, (arg) => Recreate());
+        GridParameters.EventDispatcher.Subscribe(RgfListEventKind.ColumnSettingsChanged, OnColumnSettingsChanged);
         _initialized = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-        }
         if (_initialized)
         {
             if (EntityDesc.SortColumns.Any() && !_radzenGridRef.Sorts.Any())
@@ -99,6 +96,8 @@ public partial class GridComponent : ComponentBase
     }
 
     private void OnColumnResized(DataGridColumnResizedEventArgs<RgfDynamicDictionary> args) => ListHandler.ReplaceColumnWidth(args.Column.Property, Convert.ToInt32(args.Width));
+
+    private void OnColumnSettingsChanged(IRgfEventArgs<RgfListEventArgs> args) => Recreate();
 
     private void Recreate()
     {
@@ -187,4 +186,10 @@ public partial class GridComponent : ComponentBase
     private Task OnRowDeselect(RgfDynamicDictionary arg) => _rgfGridRef.RowDeselectHandlerAsync(arg);
 
     private Task OnRowDoubleClick(DataGridRowMouseEventArgs<RgfDynamicDictionary> args) => _rgfGridRef.OnRecordDoubleClickAsync(args.Data);
+
+    public void Dispose()
+    {
+        GridParameters.EventDispatcher.Unsubscribe(RgfListEventKind.CreateRowData, OnCreateAttributes);
+        GridParameters.EventDispatcher.Unsubscribe(RgfListEventKind.ColumnSettingsChanged, OnColumnSettingsChanged);
+    }
 }
