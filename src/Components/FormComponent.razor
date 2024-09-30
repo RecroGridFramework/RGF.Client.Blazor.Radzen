@@ -38,6 +38,7 @@
 </RgfFormComponent>
 
 @inject IJSRuntime _jsRuntime
+@implements IDisposable
 @inject IRecroDictService RecroDict
 @code {
 
@@ -56,11 +57,11 @@
         base.OnInitialized();
         FormParameters.ErrorCssClass = FormParameters.ErrorCssClass ?? "rz-messages-error";
         FormParameters.ModifiedCssClass = FormParameters.ModifiedCssClass ?? "";
+        EntityParameters.FormParameters.EventDispatcher.Subscribe(RgfFormEventKind.ParametersSet, OnParametersSet);
     }
 
-    protected override void OnParametersSet()
+    private void OnParametersSet(IRgfEventArgs<RgfFormEventArgs> args)
     {
-        base.OnParametersSet();
         var rowIndex = FormParameters.FormViewKey.RowIndex;
         if (rowIndex != -1)
         {
@@ -106,4 +107,9 @@
         </RadzenFormField>
     }
     </RadzenColumn>;
+
+    public void Dispose()
+    {
+        EntityParameters.FormParameters.EventDispatcher.Unsubscribe(RgfFormEventKind.ParametersSet, OnParametersSet);
+    }
 }
