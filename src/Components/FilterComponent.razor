@@ -78,7 +78,7 @@
     {
         string name = arg?.ToString() ?? "";
         var filter = _rgfFilterRef.FilterHandler.PredefinedFilters.FirstOrDefault(e => e.Name.Equals(name));
-        _rgfFilterRef.OnSetPredefinedFilter(filter?.Key ?? name);
+        _rgfFilterRef.OnSetPredefinedFilter(filter?.Key, name);
         if (filter != null)
         {
             _rgfFilterRef.Recreate();
