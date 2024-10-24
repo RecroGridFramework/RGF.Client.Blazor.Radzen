@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using Recrovit.RecroGridFramework.Blazor.RgfApexCharts;
 using Recrovit.RecroGridFramework.Client.Blazor.RadzenUI.Components;
 using System.Reflection;
 
@@ -7,7 +8,7 @@ namespace Recrovit.RecroGridFramework.Client.Blazor.RadzenUI;
 
 public static class RGFClientBlazorRadzenConfiguration
 {
-    public static async Task InitializeRgfRadzenUIAsync(this IServiceProvider serviceProvider, string themeName = "default", bool loadResources = true)
+    public static async Task InitializeRgfRadzenUIAsync(this IServiceProvider serviceProvider, string themeName = "default", bool loadResources = true, bool shouldLoadBundledStyles = true)
     {
         RgfBlazorConfiguration.RegisterComponent<MenuComponent>(RgfBlazorConfiguration.ComponentType.Menu);
         RgfBlazorConfiguration.RegisterComponent<DialogComponent>(RgfBlazorConfiguration.ComponentType.Dialog);
@@ -16,11 +17,13 @@ public static class RGFClientBlazorRadzenConfiguration
         if (loadResources)
         {
             var jsRuntime = serviceProvider.GetRequiredService<IJSRuntime>();
-            await LoadResourcesAsync(jsRuntime, themeName);
+            await LoadResourcesAsync(jsRuntime, themeName, shouldLoadBundledStyles);
         }
+
+        await serviceProvider.InitializeRGFBlazorApexChartsAsync(loadResources, shouldLoadBundledStyles);
     }
 
-    public static async Task LoadResourcesAsync(IJSRuntime jsRuntime, string themeName)
+    public static async Task LoadResourcesAsync(IJSRuntime jsRuntime, string themeName, bool shouldLoadBundledStyles = true)
     {
         var libName = Assembly.GetExecutingAssembly().GetName().Name;
 
@@ -33,6 +36,8 @@ public static class RGFClientBlazorRadzenConfiguration
     {
         await jsRuntime.InvokeVoidAsync("eval", $"document.getElementById('{RadzenThemeId}')?.remove();");
         await jsRuntime.InvokeVoidAsync("eval", "document.getElementsByTagName('body')[0].removeAttribute('class');");
+
+        await RgfApexChartsConfiguration.UnloadResourcesAsync(jsRuntime);
     }
 
     public static readonly string RadzenThemeId = "radzen-theme";

@@ -44,6 +44,11 @@
                     <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Delete")" Icon="delete" Disabled="@(!RgfToolbar.IsSingleSelectedRow)"
                                   Click="() => RgfToolbar.OnDelete()" />
                 }
+                @if (RgfToolbar.EnableChart)
+                {
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" title="RecroChart" Icon="assessment"
+                                   Click="() => RgfToolbar.OnToolbarCommand(RgfToolbarEventKind.RecroChart)" />
+                }
                 @if (RgfToolbar.SettingsMenu != null)
                 {
                     <RadzenMenu>
