@@ -3,20 +3,20 @@
     {
         var item = Condition.Conditions[idx];
         <li>
-            <div class="d-flex flex-row align-items-center">
-                <div class="p-1">
+            <div class="rz-display-flex rz-flex-row rz-align-items-center">
+                <div class="rz-p-1">
                     <RadzenDropDown TValue="RgfFilter.LogicalOperator" TextProperty="Value" ValueProperty="Key"
                                     Data="LogicalOperators" @bind-Value=@item.LogicalOperator Disabled="idx == 0" />
                 </div>
-                <div class="p-1">
+                <div class="rz-p-1">
                     <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="delete" Click="() => OnRemoveCondition(item)" />
                 </div>
-                <div class="p-1">
+                <div class="rz-p-1">
                     <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="data_object" Click="() => OnAddBracket(item)" />
                 </div>
                 @if (item.Conditions != null)
                 {
-                    <div class="p-1">
+                    <div class="rz-p-1">
                         <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="() => OnRemoveBracket(item)" title="@RecroDict.GetRgfUiString("Delete")">
                             <sup>@item.ClientId</sup><span>(</span>
                         </RadzenButton>
@@ -24,18 +24,18 @@
                 }
                 else
                 {
-                    <div class="p-1">
+                    <div class="rz-p-1">
                         <RadzenDropDown TValue="int" TextProperty="Value" ValueProperty="Key" Value="item.PropertyId"
                                         Data="Columns" ValueChanged="(value) => OnChangeProperty(value, item)" />
                     </div>
-                    <div class="p-1">
+                    <div class="rz-p-1">
                         <RadzenDropDown TValue="RgfFilter.QueryOperator" TextProperty="Value" ValueProperty="Key"
                                         Data="GetQueryOperators(item)" @bind-Value=@item.QueryOperator Change="(arg) => OnChangeQueryOperator((RgfFilter.QueryOperator)arg, item)" />
                     </div>
                     @if (!(new[] { RgfFilter.QueryOperator.IsNull, RgfFilter.QueryOperator.IsNotNull, RgfFilter.QueryOperator.Exists }.Contains(item.QueryOperator)))
                     {
                         var prop = FilterComponent.RgfFilterProperties.Single(e => e.Id == item.PropertyId);
-                        <div class="p-1">
+                        <div class="rz-p-1">
                             @switch (prop.ClientDataType)
                             {
                                 case ClientDataType.Integer:
@@ -76,7 +76,7 @@
                         @if (new[] { RgfFilter.QueryOperator.Interval, RgfFilter.QueryOperator.IntervalE }.Contains(item.QueryOperator))
                         {
                             <span>-</span>
-                            <div class="p-1">
+                            <div class="rz-p-1">
                                 @switch (prop.ClientDataType)
                                 {
                                     case ClientDataType.Integer:
@@ -103,7 +103,7 @@
                         }
                         @if (new[] { RgfFilter.QueryOperator.Like, RgfFilter.QueryOperator.NotLike }.Contains(item.QueryOperator))
                         {
-                            <div class="p-1">
+                            <div class="rz-p-1">
                                 <RadzenCheckBox @bind-Value="item.ToLower" />
                                 <RadzenLabel Text="ToLower" />
                             </div>
@@ -127,7 +127,7 @@
         }
     }
     <li>
-        <div class="p-1">
+        <div class="rz-p-1">
             <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="add" Click="() => OnAddCondition(Condition)" />
         </div>
     </li>

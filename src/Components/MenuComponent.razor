@@ -70,9 +70,9 @@ else if (_menuItems != null)
             _menuItems = new();
             foreach (var item in MenuParameters.MenuItems)
             {
-                if (MenuParameters.MenuRenderCallback != null)
+                if (MenuParameters.OnMenuRender != null)
                 {
-                    await MenuParameters.MenuRenderCallback.Invoke(item);
+                    await MenuParameters.OnMenuRender.Invoke(item);
                 }
                 _menuItems.Add(RenderMenuItem(item));
             }
@@ -96,11 +96,11 @@ else if (_menuItems != null)
 
                 case RgfMenuType.Function:
                 case RgfMenuType.FunctionForRec:
-                    if (MenuParameters.MenuSelectionCallback != null)
+                    if (MenuParameters.OnMenuItemSelect != null)
                     {
                         builder.OpenComponent(sequence++, typeof(RadzenMenuItem));
                         builder.AddAttribute(sequence++, "class", item.CssClass);
-                        builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Click), EventCallback.Factory.Create<MenuItemEventArgs>(this, async (args) => await MenuParameters.MenuSelectionCallback.Invoke(item)));
+                        builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Click), EventCallback.Factory.Create<MenuItemEventArgs>(this, async (args) => await MenuParameters.OnMenuItemSelect.Invoke(item)));
                         builder.AddAttribute(sequence++, nameof(RadzenMenuItem.Text), item.Title);
                         builder.CloseComponent();
                     }
@@ -129,8 +129,8 @@ else if (_menuItems != null)
                         b.AddAttribute(sequence2++, nameof(MenuComponent.MenuParameters), new RgfMenuParameters()
                             {
                                 MenuItems = item.NestedMenu,
-                                MenuRenderCallback = MenuParameters.MenuRenderCallback,
-                                MenuSelectionCallback = MenuParameters.MenuSelectionCallback
+                                OnMenuRender = MenuParameters.OnMenuRender,
+                                OnMenuItemSelect = MenuParameters.OnMenuItemSelect
                             });
                         b.CloseComponent();
                     }));

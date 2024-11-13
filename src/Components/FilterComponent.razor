@@ -3,35 +3,35 @@
         <FilterConditionComponent FilterComponent="RgfFilterComp" Condition="RgfFilterComp.Condition" />
     </FilterTemplate>
     <FooterTemplate Context="RgfFilterComp">
-        <div class="d-flex flex-row justify-content-start align-items-center">
-            <div class="p-1">
+        <div class="rz-display-flex rz-flex-row rz-justify-content-flex-start rz-align-items-center">
+            <div class="rz-p-1">
                 <label class="col-form-label">Query timeout</label>
             </div>
-            <div class="p-1">
+            <div class="rz-p-1">
                 <RadzenNumeric TValue="int?" @bind-Value="RgfFilterComp.PredefinedFilter.QueryTimeout" ShowUpDown="false" Min="0" Style="width:3rem" />
             </div>
 
-            <div class="p-1">
+            <div class="rz-p-1">
                 <RadzenDropDown @bind-Value="@RgfFilterComp.PredefinedFilterName" Data="_predefList"
                                 AllowClear="true" AllowFiltering="true" LoadData="LoadData" Change="OnTextChanged" SearchTextChanged="OnTextChanged" />
             </div>
-            <div class="p-1">
+            <div class="rz-p-1">
                 <RadzenLabel Text="@RecroDict.GetRgfUiString("Public")" />
                 <RadzenCheckBox @bind-Value=@RgfFilterComp.PredefinedFilter.IsGlobal Disabled="!RgfFilterComp.IsPredefinedFilterAdmin" />
             </div>
-            <div class="p-1">
+            <div class="rz-p-1">
                 <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Save")" Icon="save"
                               Disabled="string.IsNullOrEmpty(RgfFilterComp.PredefinedFilter.Name) || !RgfFilterComp.IsPredefinedFilterAdmin && RgfFilterComp.PredefinedFilter.IsGlobal"
                               Click="() => RgfFilterComp.OnSavePredefinedFilter()" />
             </div>
-            <div class="pt-1 pb-1">
+            <div class="rz-pt-1 rz-pb-1">
                 <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Delete")" Icon="delete"
                               Disabled="string.IsNullOrEmpty(RgfFilterComp.PredefinedFilter.Key) || !RgfFilterComp.IsPredefinedFilterAdmin && RgfFilterComp.PredefinedFilter.IsGlobal"
                               Click="() => RgfFilterComp.OnDeletePredefinedFilter()" />
             </div>
         </div>
-        <div class="d-flex flex-row justify-content-between align-items-center">
-            <div class="p-1">
+        <div class="rz-display-flex rz-flex-row rz-justify-content-space-between rz-align-items-center">
+            <div class="rz-p-1">
                 <RadzenSwitch @bind-Value=@RgfFilterComp.IsFilterActive />
                 <RadzenLabel Text="@($"{RecroDict.GetRgfUiString("Off")}/{RecroDict.GetRgfUiString("On")}")" />
             </div>
