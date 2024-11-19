@@ -87,8 +87,8 @@
     </RadzenRow>;
 
     public RenderFragment<RgfFormItemParameters> FormItemLayoutTemplate => (param) =>
-    @<RadzenColumn Size="@(param.Property.FlexColumnWidth ?? param.Group.FlexColumnWidth)"
-                       class="@($"{(param.Property.EmbededGrid ? "rg-collection" : "rg-property")}")"
+    @<RadzenColumn Size="GetColumnSize(param)"
+                       class="@($"rg-group {(param.Property.EmbededGrid ? "rg-collection" : "rg-property")}")"
                        name="@param.Property.ClientName">
         @if (!string.IsNullOrEmpty(param.Property.PreElement))
     {
@@ -107,6 +107,12 @@
         </RadzenFormField>
     }
     </RadzenColumn>;
+
+    private int? GetColumnSize(RgfFormItemParameters param)
+    {
+        var width = param.Property.FlexColumnWidth ?? param.Group.FlexColumnWidth;
+        return width > 0 ? width : null;
+    }
 
     public void Dispose()
     {
