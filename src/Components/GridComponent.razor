@@ -6,7 +6,7 @@
             <RadzenDataGrid @ref="_radzenGridRef" class="recro-grid" Data="@RgfGrid.GridData" TItem="RgfDynamicDictionary"
                             AllowColumnResize="true" AllowColumnReorder="true"
                             AllowSorting="@(EntityDesc.Options.GetBoolValue("RGO_ClientMode") != true)" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
-                            SelectionMode="DataGridSelectionMode.Single" Value="RgfGrid.SelectedItems" RowSelect="OnRowSelect" RowDeselect="OnRowDeselect"
+                            SelectionMode="DataGridSelectionMode.Single" Value="RgfGrid.SelectedRowsData" RowSelect="OnRowSelect" RowDeselect="OnRowDeselect"
                             RowRender="OnRowRender" CellRender="OnCellRender"
                             LoadData="OnLoadData" Sort="OnSort" ColumnReordered="OnColumnReordered" ColumnResized="OnColumnResized"
                             RowDoubleClick="OnRowDoubleClick">

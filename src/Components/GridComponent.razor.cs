@@ -27,11 +27,10 @@ public partial class GridComponent : ComponentBase, IDisposable
 
     private RgfEntity EntityDesc => Manager.EntityDesc;
 
-    public IRgListHandler ListHandler => Manager.ListHandler;
-
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        GridParameters.EnableMultiRowSelection = false;
         GridParameters.EventDispatcher.Subscribe(RgfListEventKind.CreateRowData, OnCreateAttributes);
         GridParameters.EventDispatcher.Subscribe(RgfListEventKind.ColumnSettingsChanged, OnColumnSettingsChanged);
         _initialized = true;
@@ -85,17 +84,17 @@ public partial class GridComponent : ComponentBase, IDisposable
         {
             dict.Add(args.Column.Property, args.SortOrder == SortOrder.Ascending ? idx : -idx);
         }
-        await ListHandler.SetSortAsync(dict);
+        await Manager.ListHandler.SetSortAsync(dict);
     }
 
     private async Task OnColumnReordered(DataGridColumnReorderedEventArgs<RgfDynamicDictionary> args)
     {
-        await ListHandler.MoveColumnAsync(args.OldIndex + 1, args.NewIndex + (args.OldIndex < args.NewIndex ? 1 : 2), false);
+        await Manager.ListHandler.MoveColumnAsync(args.OldIndex + 1, args.NewIndex + (args.OldIndex < args.NewIndex ? 1 : 2), false);
         //_radzenGridRef.Reset();
         Recreate();
     }
 
-    private void OnColumnResized(DataGridColumnResizedEventArgs<RgfDynamicDictionary> args) => ListHandler.ReplaceColumnWidth(args.Column.Property, Convert.ToInt32(args.Width));
+    private void OnColumnResized(DataGridColumnResizedEventArgs<RgfDynamicDictionary> args) => Manager.ListHandler.ReplaceColumnWidth(args.Column.Property, Convert.ToInt32(args.Width));
 
     private void OnColumnSettingsChanged(IRgfEventArgs<RgfListEventArgs> args) => Recreate();
 
@@ -181,9 +180,22 @@ public partial class GridComponent : ComponentBase, IDisposable
         }
     }
 
-    private Task OnRowSelect(RgfDynamicDictionary arg) => _rgfGridRef.RowSelectHandlerAsync(arg);
+    private async Task OnRowSelect(RgfDynamicDictionary rowData)
+    {
+        if (_rgfGridRef.SelectedItems.Any())
+        {
+            int idx = Manager.ListHandler.GetAbsoluteRowIndex(rowData);
+            bool deselect = _rgfGridRef.SelectedItems.ContainsKey(idx);
+            await _rgfGridRef.RowDeselectHandlerAsync(rowData);
+            if (deselect)
+            {
+                return;
+            }
+        }
+        await _rgfGridRef.RowSelectHandlerAsync(rowData);
+    }
 
-    private Task OnRowDeselect(RgfDynamicDictionary arg) => _rgfGridRef.RowDeselectHandlerAsync(arg);
+    private Task OnRowDeselect(RgfDynamicDictionary rowData) => _rgfGridRef.RowDeselectHandlerAsync(rowData);
 
     private Task OnRowDoubleClick(DataGridRowMouseEventArgs<RgfDynamicDictionary> args) => _rgfGridRef.OnRecordDoubleClickAsync(args.Data);
 
