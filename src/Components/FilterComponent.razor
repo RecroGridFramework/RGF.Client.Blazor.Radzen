@@ -5,28 +5,28 @@
     <FooterTemplate Context="RgfFilterComp">
         <div class="rz-display-flex rz-flex-row rz-justify-content-flex-start rz-align-items-center">
             <div class="rz-p-1">
-                <label class="col-form-label">Query timeout</label>
+                <label class="col-form-label">@RecroDict.GetRgfUiString("SQLTimeout"):</label>
             </div>
             <div class="rz-p-1">
-                <RadzenNumeric TValue="int?" @bind-Value="RgfFilterComp.PredefinedFilter.QueryTimeout" ShowUpDown="false" Min="0" Style="width:3rem" />
+                <RadzenNumeric TValue="int?" @bind-Value="RgfFilterComp.FilterSettings.SQLTimeout" ShowUpDown="false" Min="0" Style="width:3rem" />
             </div>
 
             <div class="rz-p-1">
-                <RadzenDropDown @bind-Value="@RgfFilterComp.PredefinedFilterName" Data="_predefList"
+                <RadzenDropDown @bind-Value="@RgfFilterComp.FilterSettings.SettingsName" Data="RgfFilterComp.FilterHandler.PredefinedFilters.Select(e=> e.SettingsName)"
                                 AllowClear="true" AllowFiltering="true" LoadData="LoadData" Change="OnTextChanged" SearchTextChanged="OnTextChanged" />
             </div>
             <div class="rz-p-1">
-                <RadzenLabel Text="@RecroDict.GetRgfUiString("Public")" />
-                <RadzenCheckBox @bind-Value=@RgfFilterComp.PredefinedFilter.IsGlobal Disabled="!RgfFilterComp.IsPredefinedFilterAdmin" />
+                <RadzenDropDown TValue="string" TextProperty="Value" ValueProperty="Key" @bind-Value="@RgfFilterComp.FilterSettings.RoleId" Data="RgfFilterComp.VisibleRoles"
+                                Disabled="RgfFilterComp.FilterSettings.IsReadonly == true || !RgfFilterComp.IsPublicFilterSettingAllowed || string.IsNullOrEmpty(RgfFilterComp.FilterSettings.SettingsName)" />
             </div>
             <div class="rz-p-1">
                 <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Save")" Icon="save"
-                              Disabled="string.IsNullOrEmpty(RgfFilterComp.PredefinedFilter.Name) || !RgfFilterComp.IsPredefinedFilterAdmin && RgfFilterComp.PredefinedFilter.IsGlobal"
+                              Disabled="RgfFilterComp.FilterSettings.IsReadonly == true || string.IsNullOrEmpty(RgfFilterComp.FilterSettings.SettingsName) || !RgfFilterComp.IsPublicFilterSettingAllowed && RgfFilterComp.FilterSettings.RoleId != null"
                               Click="() => RgfFilterComp.OnSavePredefinedFilter()" />
             </div>
             <div class="rz-pt-1 rz-pb-1">
                 <RadzenButton ButtonStyle="ButtonStyle.Light" title="@RecroDict.GetRgfUiString("Delete")" Icon="delete"
-                              Disabled="string.IsNullOrEmpty(RgfFilterComp.PredefinedFilter.Key) || !RgfFilterComp.IsPredefinedFilterAdmin && RgfFilterComp.PredefinedFilter.IsGlobal"
+                              Disabled="RgfFilterComp.FilterSettings.IsReadonly == true || RgfFilterComp.FilterSettings.FilterSettingsId == null || !RgfFilterComp.IsPublicFilterSettingAllowed && RgfFilterComp.FilterSettings.RoleId != null"
                               Click="() => RgfFilterComp.OnDeletePredefinedFilter()" />
             </div>
         </div>
@@ -65,11 +65,10 @@
 
     private void LoadData(LoadDataArgs args)
     {
-        _predefList = _rgfFilterRef.FilterHandler.PredefinedFilters.Select(e => e.Name).ToList();
+        _predefList = _rgfFilterRef.FilterHandler.PredefinedFilters.Select(e => e.SettingsName).ToList();
         if (!_predefList.Contains(args.Filter, StringComparer.OrdinalIgnoreCase))
         {
             _predefList.Add(args.Filter);
-            _rgfFilterRef.PredefinedFilterName = args.Filter;
         }
         _rgfFilterRef.Recreate();
     }
@@ -77,8 +76,8 @@
     private void OnTextChanged(object arg)
     {
         string name = arg?.ToString() ?? "";
-        var filter = _rgfFilterRef.FilterHandler.PredefinedFilters.FirstOrDefault(e => e.Name.Equals(name));
-        _rgfFilterRef.OnSetPredefinedFilter(filter?.Key, name);
+        var filter = _rgfFilterRef.FilterHandler.PredefinedFilters.FirstOrDefault(e => e.SettingsName.Equals(name));
+        _rgfFilterRef.OnSetPredefinedFilter(filter?.FilterSettingsId, name);
         if (filter != null)
         {
             _rgfFilterRef.Recreate();
