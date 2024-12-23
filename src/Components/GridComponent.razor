@@ -17,7 +17,7 @@
                                               Sortable="prop.Orderable" 
                                               Width="@(prop.ColWidth > 0 ? $"{prop.ColWidth}px" : null)">
                             <Template>
-                                @RgfGrid.CreateGridColumn(prop, context)
+                                @RgfGrid.RenderContentItem(prop, context)
                             </Template>
                         </RadzenDataGridColumn>
                     }
@@ -27,7 +27,7 @@
     </GridTemplate>
 
     <ColumnSettingsTemplate>
-        <GridColumnSettingsComponent BaseGridComponent="context" />
+        <GridColumnSettingsComponent BaseDataComponent="context" />
     </ColumnSettingsTemplate>
 </RgfGridComponent>
 
