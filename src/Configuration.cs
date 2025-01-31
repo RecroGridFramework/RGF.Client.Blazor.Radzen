@@ -27,9 +27,9 @@ public static class RGFClientBlazorRadzenConfiguration
     {
         var libName = Assembly.GetExecutingAssembly().GetName().Name;
 
-        await jsRuntime.InvokeVoidAsync("import", $"{RgfClientConfiguration.AppRootPath}_content/Radzen.Blazor/Radzen.Blazor.js");
-        await jsRuntime.InvokeVoidAsync("Recrovit.LPUtils.AddStyleSheetLink", $"{RgfClientConfiguration.AppRootPath}_content/Radzen.Blazor/css/{themeName}.css", false, RadzenThemeId);
-        await jsRuntime.InvokeVoidAsync("import", $"{RgfClientConfiguration.AppRootPath}_content/{libName}/scripts/recrovit-rgf-blazor-radzen.js");
+        await jsRuntime.InvokeVoidAsync("import", $"{RgfClientConfiguration.AppRootPath}/_content/Radzen.Blazor/Radzen.Blazor.js");
+        await jsRuntime.InvokeVoidAsync("Recrovit.LPUtils.AddStyleSheetLink", $"{RgfClientConfiguration.AppRootPath}/_content/Radzen.Blazor/css/{themeName}.css", false, RadzenThemeId);
+        await jsRuntime.InvokeVoidAsync("import", $"{RgfClientConfiguration.AppRootPath}/_content/{libName}/scripts/recrovit-rgf-blazor-radzen.js");
     }
 
     public static async Task UnloadResourcesAsync(IJSRuntime jsRuntime)
