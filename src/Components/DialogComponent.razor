@@ -38,25 +38,7 @@
         }
     }
 
-    private bool OnClose()
-    {
-        if (_isDestroyed)
-        {
-            return true;
-        }
-        bool cancel = false;
-        if (_closeCallback != null)
-        {
-            cancel = _closeCallback.Invoke() == false;
-        }
-        if (!cancel)
-        {
-            Destroy();
-        }
-        return cancel;
-    }
-
-    private void Destroy()
+    private Task OnDestroyAsync(IRgfEventArgs<RgfDialogEventArgs> args)
     {
         if (!_isDestroyed)
         {
@@ -64,6 +46,7 @@
             _dialog = null;
             _isDestroyed = true;
         }
+        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -71,9 +54,7 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            _closeCallback = DialogParameters.OnClose;
-            DialogParameters.OnClose = OnClose;
-            DialogParameters.Destroy = Destroy;
+            DialogParameters.EventDispatcher.Subscribe(RgfDialogEventKind.Destroy, OnDestroyAsync);
             _dialog = await _dialogService.OpenAsync((string?)null, ds => CustomDialog, new DialogOptions()
                 {
                     ShowTitle = true,
