@@ -70,7 +70,7 @@
         {
             _predefList.Add(args.Filter);
         }
-        _rgfFilterRef.Recreate();
+        _ = _rgfFilterRef.RecreateAsync();
     }
 
     private void OnTextChanged(object arg)
@@ -80,7 +80,7 @@
         _rgfFilterRef.OnSetPredefinedFilter(filter?.FilterSettingsId, name);
         if (filter != null)
         {
-            _rgfFilterRef.Recreate();
+            _ = _rgfFilterRef.RecreateAsync();
         }
     }
 }
