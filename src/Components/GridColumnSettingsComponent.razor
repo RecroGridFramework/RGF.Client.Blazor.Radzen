@@ -9,16 +9,16 @@
                 </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < RgfColSettings.Columns.Length; i++)
+                @foreach (var settings in RgfColSettings.Columns)
                 {
-                    var col = RgfColSettings.Columns[i];
+                    var col = settings;
                     <tr>
-                        <td class="@($"rz-text-nowrap {col.CssClass}")">@col.Property.ColTitle</td>
+                        <td class="@($"rz-text-nowrap {col.CssClass}")">@(col.PathTitle ?? col.Property.ColTitle)</td>
                         <td>
-                            <RadzenNumeric TValue="int?" @bind-Value="col.ColPos" Style="width:125px" />
+                            <RadzenNumeric TValue="int?" @bind-Value="col.ColPosOrNull" Style="width:125px" />
                         </td>
                         <td>
-                            <RadzenNumeric TValue="int?" @bind-Value="col.ColWidth" Style="width:125px" />
+                            <RadzenNumeric TValue="int?" @bind-Value="col.ColWidthOrNull" Style="width:125px" />
                         </td>
                     </tr>
                 }
