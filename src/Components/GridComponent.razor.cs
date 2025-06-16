@@ -113,7 +113,7 @@ public partial class GridComponent : ComponentBase, IDisposable
     {
         _logger.LogDebug("CreateAttributes");
         var rowData = ars.Args.Data ?? throw new ArgumentException();
-        foreach (var prop in EntityDesc.SortedVisibleColumns)
+        foreach (var prop in Manager.ListHandler.SortedVisibleColumns)
         {
             string? propClass = null;
             if (prop.FormType == PropertyFormType.CheckBox)
